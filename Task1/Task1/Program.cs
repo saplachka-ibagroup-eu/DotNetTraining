@@ -3,8 +3,12 @@
 
 public class Program
 {
+    const int MinLength = 8;
+    const int MaxLength = 30;
+
     public static void Main()
     {
+        
         string? initialWord = GetInitialWord();
 
         Console.WriteLine($"Initial word: {initialWord}.The game has started.");
@@ -16,15 +20,16 @@ public class Program
             
             string? player1 = Console.ReadLine();
 
-            if (!IsValidWord(initialWord, player1))
-            {   PrintMessage(player1, "Player2");
+            if (!IsValidPlayerWord(initialWord, player1))
+            {   
+                PrintMessage(player1, "Player2");
                 break;
             }
             else
             {
                 Console.WriteLine("Player2 enter a word (press Enter to finish):");
                 string? player2 = Console.ReadLine();
-                if (IsValidWord(initialWord, player2))
+                if (IsValidPlayerWord(initialWord, player2))
                 {
                     continue;
                 }
@@ -37,21 +42,25 @@ public class Program
         }
     }
 
-    public static Boolean IsValidWord(string input, string word) => !string.IsNullOrEmpty(word) && word.All(ch => input.Contains(ch) &&
-                                                                            word.GroupBy(c => c)
-                                                                                .All(g => g.Count() <= input.Count(c => c == g.Key)));
+    public static bool IsValidPlayerWord(string? input, string? word) => !string.IsNullOrEmpty(word) && word.All(ch => input.Contains(ch) &&
+                                                                          word.GroupBy(c => c)
+                                                                              .All(g => g.Count() <= input.Count(c => c == g.Key)));
+
+    public static bool IsInvalidInitialWord(string? word) => word is null || word?.Length < MinLength || word?.Length >= MaxLength || !word!.All(Char.IsLetter);
+
+    
+
     public static string GetInitialWord() {
         string? initialWord;
-        const int MIN_LENGTH = 8;
-        const int MAX_LENGTH = 30;
+
 
         do
         {
-            Console.WriteLine($"Enter a word longer than {MIN_LENGTH} and less than {MAX_LENGTH} characters to start a game:");
+            Console.WriteLine($"Enter a word longer than {MinLength} and less than {MaxLength} characters to start a game:");
             initialWord = Console.ReadLine();
 
         }
-        while (initialWord is null || initialWord?.Length < MIN_LENGTH || initialWord?.Length >= MAX_LENGTH || !initialWord!.All(Char.IsLetter));
+        while (IsInvalidInitialWord(initialWord));
         return initialWord;
     }
 
@@ -62,7 +71,10 @@ public class Program
             Console.WriteLine($"You didn't enter a word. You lost: {player} is winner");
         }
 
-        else { Console.WriteLine($"The entered word: {word} is invalid. You lost: {player} is winner"); }
+        else 
+        { 
+            Console.WriteLine($"The entered word: {word} is invalid. You lost: {player} is winner"); 
+        }
     }
 
 }
