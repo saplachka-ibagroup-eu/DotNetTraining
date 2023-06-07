@@ -10,13 +10,19 @@ public class Program
     {
         try
         {
-            Console.WriteLine("Player1 enter your name (press Enter to finish):");
+            DbManager dbManager = new DbManager();
 
-            Player pl1 = DbManager.FindOrCreatePlayer();
+            GameManager gameManager = new GameManager();
 
-            Console.WriteLine("Player2 enter your name (press Enter to finish):");
+            ICommand reader = new CommandReader();
 
-            Player pl2 = DbManager.FindOrCreatePlayer();
+            string? name = reader.PromptInput("Player1 enter your name (press Enter to finish):");
+
+            Player pl1 = dbManager.FindOrCreatePlayer(name);
+
+            name = reader.PromptInput("Player2 enter your name (press Enter to finish):");
+
+            Player pl2 = dbManager.FindOrCreatePlayer(name);
 
             List<string> wordsList = new List<string>();
 
@@ -25,13 +31,11 @@ public class Program
             Console.WriteLine($"Initial word: {initialWord}.The game has started.");
 
             string? word;
-
+           
             while (true)
             {
-                Console.WriteLine($"{pl1.Name} enter a word (press Enter to finish):");
-
-                word = DbManager.ReadCommands(pl1, pl2, wordsList, pl1.Name);
-
+                
+                word = gameManager.ReadCommand(pl1, pl2, wordsList, pl1.Name);
 
                 if (!IsValidPlayerWord(initialWord, word))
                 {
@@ -43,8 +47,8 @@ public class Program
                 }
                 else
                 {
-                    Console.WriteLine($"{pl2.Name} enter a word (press Enter to finish):");
-                    word = DbManager.ReadCommands(pl1, pl2, wordsList, pl2.Name);
+                                       
+                    word = gameManager.ReadCommand(pl1, pl2, wordsList, pl2.Name);
 
                     if (IsValidPlayerWord(initialWord, word))
                     {
@@ -60,7 +64,7 @@ public class Program
                 }
             }
 
-            DbManager.SavePlayer(pl1, pl2);
+            dbManager.SavePlayer(pl1, pl2);
         }     
 
         catch (Exception ex)
